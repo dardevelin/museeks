@@ -1,5 +1,5 @@
 
-const init = function(...modules) {
+const init = function (...modules) {
   modules.forEach((module) => {
     module.init();
   });

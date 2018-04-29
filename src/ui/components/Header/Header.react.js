@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import Input from 'react-simple-input';
 import KeyBinding from 'react-keybinding-component';
 
-import PlayingBar     from './PlayingBar.react';
+import PlayingBar from './PlayingBar.react';
 import WindowControls from './WindowControls.react';
 import PlayerControls from './PlayerControls.react';
 
@@ -22,12 +22,12 @@ import { isCtrlKey } from '../../utils/utils-platform';
 
 class Header extends Component {
   static propTypes = {
-    playerStatus: PropTypes.string,
-    queue: PropTypes.array,
-    queueCursor: PropTypes.number,
-    shuffle: PropTypes.bool,
-    repeat: PropTypes.string,
-    showTopHeader: PropTypes.bool,
+    playerStatus: PropTypes.string.isRequired,
+    repeat: PropTypes.string.isRequired,
+    shuffle: PropTypes.bool.isRequired,
+    queue: PropTypes.array.isRequired,
+    queueCursor: PropTypes.number.isRequired,
+    showTopHeader: PropTypes.bool.isRequired,
   }
 
   constructor(props) {
@@ -36,35 +36,38 @@ class Header extends Component {
     this.onKey = this.onKey.bind(this);
   }
 
-  search(e) {
-    LibraryActions.search(e.target.value);
-  }
-
   onKey(e) {
+    // ctrl-f shortcut
     if (isCtrlKey(e) && e.keyCode === 70) {
       this.refs.search.refs.input.select();
     }
   }
 
+  search(e) {
+    LibraryActions.search(e.target.value);
+  }
+
   render() {
-    const { playerStatus, queue, queueCursor, shuffle, repeat, showTopHeader } = this.props;
+    const {
+      playerStatus, queue, queueCursor, shuffle, repeat, showTopHeader,
+    } = this.props;
 
     return (
       <header>
         {
           showTopHeader && (
-            <div className='top-header'>
+            <div className="top-header">
               <WindowControls />
             </div>
           )
         }
-        <div className='main-header'>
-          <div className='col-main-controls'>
+        <div className="main-header">
+          <div className="col-main-controls">
             <PlayerControls
               playerStatus={playerStatus}
             />
           </div>
-          <div className='col-player-infos'>
+          <div className="col-player-infos">
             <PlayingBar
               queue={queue}
               queueCursor={queueCursor}
@@ -75,11 +78,11 @@ class Header extends Component {
           <div className="col-search-controls">
             <Input
               selectOnClick
-              placeholder='search'
-              className='form-control input-sm search'
+              placeholder="search"
+              className="form-control input-sm search"
               changeTimeout={250}
               clearButton
-              ref='search'
+              ref="search"
               onChange={this.search}
             />
           </div>

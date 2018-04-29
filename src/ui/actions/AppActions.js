@@ -2,16 +2,31 @@ import electron from 'electron';
 import os from 'os';
 
 import Player from '../lib/player';
-import { browserWindows, config }  from '../lib/app';
+import { browserWindows, config } from '../lib/app';
 import * as utils from '../utils/utils';
 
-import * as LibraryActions  from './LibraryActions';
+import * as LibraryActions from './LibraryActions';
 import * as PlaylistsActions from './PlaylistsActions';
 import * as NotificationsActions from './NotificationsActions';
 import * as PlayerActions from './PlayerActions';
 import * as SettingsActions from './SettingsActions';
 
-const ipcRenderer    = electron.ipcRenderer;
+const { ipcRenderer } = electron;
+
+const saveBounds = () => {
+  const now = window.performance.now();
+
+  if (now - this.lastFilterSearch < 250) {
+    clearTimeout(this.saveBoundTimeout);
+  }
+
+  this.lastFilterSearch = now;
+
+  this.saveBoundTimeout = setTimeout(() => {
+    config.set('bounds', browserWindows.main.getBounds());
+    config.saveSync();
+  }, 250);
+};
 
 const init = () => {
   // Usual tasks
@@ -52,7 +67,7 @@ const init = () => {
 
     ipcRenderer.send('playback:trackChange', track);
 
-    if(browserWindows.main.isFocused()) return;
+    if (browserWindows.main.isFocused()) return;
 
     const cover = await utils.fetchCover(track.path);
     NotificationsActions.add({
@@ -68,7 +83,11 @@ const init = () => {
 
   // Listen for main-process events
   ipcRenderer.on('playback:play', () => {
-    Player.getSrc() ? PlayerActions.play() : PlayerActions.start();
+    if (Player.getSrc()) {
+      PlayerActions.play();
+    } else {
+      PlayerActions.start();
+    }
   });
 
   ipcRenderer.on('playback:pause', () => {
@@ -116,22 +135,10 @@ const minimize = () => {
 };
 
 const maximize = () => {
-  browserWindows.main.isMaximized() ? browserWindows.main.unmaximize() : browserWindows.main.maximize();
-};
+  const mainWindow = browserWindows.main;
 
-const saveBounds = () => {
-  const now = window.performance.now();
-
-  if (now - self.lastFilterSearch < 250) {
-    clearTimeout(self.saveBoundTimeout);
-  }
-
-  self.lastFilterSearch = now;
-
-  self.saveBoundTimeout = setTimeout(() => {
-    config.set('bounds', browserWindows.main.getBounds());
-    config.saveSync();
-  }, 250);
+  if (mainWindow.isMaximized()) mainWindow.unmaximize();
+  else mainWindow.maximize();
 };
 
 export default {

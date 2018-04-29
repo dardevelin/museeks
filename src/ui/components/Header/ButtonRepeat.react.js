@@ -19,7 +19,7 @@ const svgMap = {
 
 export default class ButtonRepeat extends Component {
   static propTypes = {
-    repeat: PropTypes.string,
+    repeat: PropTypes.string.isRequired,
   }
 
   constructor(props) {
@@ -31,7 +31,7 @@ export default class ButtonRepeat extends Component {
   toggleRepeat() {
     let repeat = 'none';
 
-    switch(this.props.repeat) {
+    switch (this.props.repeat) {
       case 'none':
         repeat = 'all';
         break;
@@ -41,6 +41,8 @@ export default class ButtonRepeat extends Component {
       case 'one':
         repeat = 'none';
         break;
+      default:
+        break;
     }
 
     PlayerActions.repeat(repeat);
@@ -48,13 +50,13 @@ export default class ButtonRepeat extends Component {
 
   render() {
     const svg = svgMap[this.props.repeat] || svgMap.default;
-    const buttonClasses = classnames('button repeat',{
+    const buttonClasses = classnames('button repeat', {
       active: this.props.repeat === 'one' || this.props.repeat === 'all',
     });
 
     const svgClasses = classnames('icon', {
       'repeat-one': this.props.repeat === 'one',
-      'repeat': this.props.repeat !== 'one',
+      repeat: this.props.repeat !== 'one',
     });
 
     return (
